@@ -101,6 +101,9 @@ class Dataset:
         self.public = public
         self._load_meta()
 
+        if dataset_exists(self.storage):
+            logger.info(f"{self.path} loaded successfully.")
+
         hub_reporter.feature_report(
             feature_name="Dataset", parameters={"Path": str(self.path)}
         )
@@ -206,7 +209,6 @@ class Dataset:
         meta_key = get_dataset_meta_key()
 
         if dataset_exists(self.storage):
-            logger.info(f"{self.path} loaded successfully.")
             self.meta = self.storage.get_cachable(meta_key, DatasetMeta)
 
             for tensor_name in self.meta.tensors:
@@ -328,6 +330,8 @@ class Dataset:
         if self.path.startswith("hub://"):
             self.client.delete_dataset_entry(self.org_id, self.ds_name)
             logger.info(f"Hub Dataset {self.path} successfully deleted.")
+        else:
+            logger.info(f"Dataset {self.path} successfully deleted.")
 
     @staticmethod
     def from_path(path: str):
